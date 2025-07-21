@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>eBay Fee Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Define CSS Variables for colors */
+        :root {
+            /* LIGHT MODE */
+            --body-bg: url('path/to/your-light-mode-image.png'); /* IMPORTANT: REPLACE WITH YOUR ACTUAL IMAGE PATH */
+            --text-color: #222; /* Very dark grey for main text */
+            --container-bg-glass: rgba(215, 215, 215, 0.7); /* d7d7d7 with transparency */
+            --container-border-glass: rgba(180, 180, 180, 0.8); /* Softer grey border */
+            --input-field-bg-glass: rgba(240, 240, 240, 0.8); /* Slightly lighter for input fields */
+            --input-field-border-glass: #999; /* Darker border for inputs */
+            --heading-color: #1a1a1a; /* Almost black for headings */
+            --label-color: #333; /* Dark grey for labels */
+            --input-focus-border: #66aaff; /* Softer blue for focus */
+            --input-focus-shadow: rgba(102, 170, 255, 0.25); /* Softer blue shadow */
+            --button-bg: #7bc066; /* Softer green */
+            --button-hover-bg: #6aa85a; /* Slightly darker softer green for hover */
+            --button-shadow: rgba(123, 192, 102, 0.3); /* Softer green shadow */
+            --reset-button-bg: #e07a7a; /* Softer red */
+            --reset-button-hover-bg: #cc6a6a; /* Slightly darker softer red for hover */
+            --reset-button-shadow: rgba(224, 122, 122, 0.3); /* Softer red shadow */
+            --separator-color: #bbb; /* Separator color */
+            --result-value-color: #4a90e2; /* Softer blue for result values */
+            --p-color: #444; /* Dark grey for paragraphs */
+            --box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12); /* Standard shadow */
+        }
+
+        /* Dark Mode Colors - Overriding Light Mode variables */
+        .dark-mode {
+            --body-bg: url('dark_background.png'); /* DARK MODE BACKGROUND IMAGE - USING YOUR LOCAL GIF */
+            --text-color: #e0e0e0; /* Light grey text */
+            --container-bg-glass: rgba(0, 0, 0, 0.3); /* Dark transparent container */
+            --container-border-glass: rgba(255, 255, 255, 0.1); /* Light transparent border */
+            --input-field-bg-glass: rgba(0, 0, 0, 0.5); /* Darker transparent inputs */
+            --input-field-border-glass: rgba(255, 255, 255, 0.2); /* Lighter border for inputs */
+            --heading-color: #ffffff; /* White headings */
+            --label-color: #e0e0e0; /* Light grey labels */
+            --input-focus-border: #009CDF; /* Bright blue for focus */
+            --input-focus-shadow: rgba(0, 157, 223, 0.25); /* Blue shadow */
+            --button-bg: #5EBD3E; /* Dark mode green button */
+            --button-hover-bg: #4CAF33; /* Darker green on hover */
+            --button-shadow: rgba(94, 189, 62, 0.3);
+            --reset-button-bg: #BB3E3E; /* Dark mode red button */
+            --reset-button-hover-bg: #A53030; /* Darker red on hover */
+            --reset-button-shadow: rgba(187, 62, 62, 0.3);
+            --separator-color: #444; /* Dark separator */
+            --result-value-color: #009CDF; /* Bright blue for result values */
+            --p-color: #c0c0c0; /* Light grey paragraphs */
+            --box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3); /* Darker shadow */
+        }
+
+        /* General Body Styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 40px 20px;
+            background: var(--body-bg); 
+            background-size: cover;      
+            background-position: center center; 
+            background-repeat: no-repeat; 
+            background-attachment: fixed; 
+            color: var(--text-color); /* Uses generic --text-color */
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            transition: background 0.4s ease, color 0.4s ease; 
+        }
+
+        /* Calculator Container */
+        .calculator-container {
+            background-color: var(--container-bg-glass); /* Uses generic --container-bg-glass */
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: var(--box-shadow); /* Uses generic --box-shadow */
+            width: 100%;
+            max-width: 500px;
+            box-sizing: border-box;
+            border: 1px solid var(--container-border-glass); /* Uses generic --container-border-glass */
+            backdrop-filter: blur(10px); 
+            -webkit-backdrop-filter: blur(10px); 
+            transition: background-color 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
+        }
+
+        h1 {
+            color: var(--heading-color); /* Uses generic --heading-color */
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 2.2em;
+            font-weight: 700;
+            transition: color 0.4s ease;
+        }
+
+        p {
+            text-align: center;
+            margin-bottom: 25px;
+            color: var(--p-color); /* Uses generic --p-color */
+            line-height: 1.6;
+            transition: color 0.4s ease;
+        }
+
+        /* Form Group for Labels and Inputs */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--label-color); /* Uses generic --label-color */
+            font-weight: 600;
+            font-size: 0.95em;
+            transition: color 0.4s ease;
+        }
+
+        /* Styles for input[type="number"] and select */
+        input[type="number"],
+        select { 
+            width: calc(100% - 20px);
+            padding: 12px 10px;
+            border: 1px solid var(--input-field-border-glass); /* Uses generic --input-field-border-glass */
+            border-radius: 6px;
+            font-size: 1.05em;
+            color: var(--text-color); /* Uses generic --text-color */
+            background-color: var(--input-field-bg-glass); /* Uses generic --input-field-bg-glass */
+            transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out, color 0.4s ease, background-color 0.4s ease;
+            box-sizing: border-box;
+            -webkit-appearance: none; 
+            -moz-appearance: none;
+            appearance: none;
+            cursor: pointer;
+        }
+
+        /* HIDE SPIN BUTTONS FOR NUMBER INPUTS */
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0; 
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+
+        input[type="number"]:focus,
+        select:focus { 
+            border-color: var(--input-focus-border); /* Uses generic --input-focus-border */
+            outline: none;
+            box-shadow: 0 0 0 3px var(--input-focus-shadow); /* Uses generic --input-focus-shadow */
+        }
+
+        /* Button Styling */
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px; 
+            margin-top: 15px;
+        }
+
+        button {
+            padding: 14px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out, box-shadow 0.3s ease-in-out;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+        }
+
+        button.calculate-btn {
+            background-color: var(--button-bg); /* Uses generic --button-bg */
+            color: white;
+            box-shadow: 0 4px 10px var(--button-shadow); /* Uses generic --button-shadow */
+        }
+
+        button.calculate-btn:hover {
+            background-color: var(--button-hover-bg); /* Uses generic --button-hover-bg */
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px var(--button-shadow);
+        }
+
+        button.calculate-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px var(--button-shadow);
+        }
+
+        button.reset-btn {
+            background-color: var(--reset-button-bg); /* Uses generic --reset-button-bg */
+            color: white;
+            box-shadow: 0 4px 10px var(--reset-button-shadow); /* Uses generic --reset-button-shadow */
+        }
+
+        button.reset-btn:hover {
+            background-color: var(--reset-button-hover-bg); /* Uses generic --reset-button-hover-bg */
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px var(--reset-button-shadow);
+        }
+
+        button.reset-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px var(--reset-button-shadow);
+        }
+
+        /* Result Area */
+        .result {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--separator-color); /* Uses generic --separator-color */
+            text-align: center;
+            transition: border-top-color 0.4s ease;
+        }
+
+        .result p {
+            margin-bottom: 10px;
+            font-size: 1.15em;
+            color: var(--text-color); /* Uses generic --text-color */
+        }
+
+        .result p:last-child {
+            margin-bottom: 0;
+            font-size: 1.3em;
+            color: var(--heading-color); /* Uses generic --heading-color */
+        }
+
+        .result span {
+            font-weight: 700;
+            color: var(--result-value-color); /* Uses generic --result-value-color */
+            transition: color 0.4s ease;
+        }
+
+        /* Dark Mode Toggle Switch */
+        .theme-switch-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            margin-bottom: 20px; 
+            width: 100%;
+        }
+
+        .theme-switch {
+            display: inline-block;
+            height: 34px;
+            position: relative;
+            width: 60px;
+        }
+
+        .theme-switch input {
+            display: none;
+        }
+
+        .slider {
+            background-color: #ccc;
+            bottom: 0;
+            cursor: pointer;
+            left: 0;
+            position: absolute;
+            right: 0;
+            top: 0;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            background-color: #fff;
+            bottom: 4px;
+            content: "";
+            height: 26px;
+            left: 4px;
+            position: absolute;
+            width: 26px;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #009CDF;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .theme-switch-wrapper span {
+            margin-right: 10px;
+            color: var(--text-color); /* Uses generic --text-color */
+            font-weight: 600; 
+            font-size: 0.9em; 
+            transition: color 0.4s ease;
+        }
+
+        /* Disclaimer Styling */
+        .disclaimer {
+            font-size: 0.8em;
+            color: var(--p-color); /* Uses generic --p-color */
+            text-align: center;
+            margin-top: 30px;
+            border-top: 1px solid var(--separator-color); /* Uses generic --separator-color */
+            padding-top: 15px;
+            line-height: 1.5;
+        }
+        .disclaimer strong {
+            color: var(--heading-color); /* Uses generic --heading-color */
+        }
+
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            body {
+                padding: 20px 10px;
+            }
+            .calculator-container {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator-container">
+        <div class="theme-switch-wrapper">
+            <span>Dark Mode</span> 
+            <label class="theme-switch" for="checkbox">
+                <input type="checkbox" id="checkbox" />
+                <div class="slider round"></div>
+            </label>
+        </div>
+
+        <h1>eBay Fee Calculator</h1>
+
+        <p>Estimate your net profit after eBay fees by selecting a category.</p>
+
+        <div class="form-group">
+            <label for="categorySelect">Select Category:</label>
+            <select id="categorySelect" onchange="toggleCustomPercentageInput(); calculateFees();">
+                <option value="sportsCards">Sports Trading Cards</option>
+                <option value="mostOtherCategories">Most Other Categories (e.g., Electronics, Home & Garden)</option>
+                <option value="fashion">Fashion (Clothing, Shoes & Accessories)</option>
+                <option value="custom">Custom Percentage</option>
+            </select>
+        </div>
+
+        <div class="form-group" id="customPercentageGroup" style="display: none;">
+            <label for="customPercentage">Custom FVF Percentage (%):</label>
+            <input type="number" id="customPercentage" value="10.00" step="0.01" min="0" max="100" oninput="calculateFees()">
+        </div>
+
+        <div class="form-group">
+            <label for="soldPrice">Sold Price of Item ($):</label>
+            <input type="number" id="soldPrice" value="0.00" step="0.01" min="0" oninput="calculateFees()">
+        </div>
+
+        <div class="form-group">
+            <label for="customerShipping">Customer Paid for Shipping ($):</label>
+            <input type="number" id="customerShipping" value="0.00" step="0.01" min="0" oninput="calculateFees()">
+        </div>
+
+        <div class="form-group">
+            <label for="yourShipping">Your Actual Shipping Cost ($):</label>
+            <input type="number" id="yourShipping" value="0.00" step="0.01" min="0" oninput="calculateFees()">
+        </div>
+
+        <div class="form-group">
+            <label for="insertionFee">Insertion Fee (per listing, e.g., 0.35 if applicable, 0 for free listings):</label>
+            <input type="number" id="insertionFee" value="0.00" step="0.01" min="0" oninput="calculateFees()">
+        </div>
+
+        <div class="button-group">
+            <button class="calculate-btn" onclick="calculateFees()">Calculate Profit</button>
+            <button class="reset-btn" onclick="resetCalculator()">Reset</button>
+        </div>
+
+        <div class="result">
+            <p>Total eBay Fees: $<span id="totalEbayFees">0.00</span></p>
+            <p>Net Profit: $<span id="netProfit">0.00</span></p>
+        </div>
+
+        <div class="disclaimer">
+            <strong>Disclaimer:</strong> This calculator provides an *estimation* of eBay fees and net profit. Fees can vary based on specific subcategories, seller status, promotions, or international sales. It does NOT account for sales tax collected by eBay (which FVF is also charged on) or any other additional fees you might incur. Always refer to <a href="https://www.ebay.com/help/selling/fees-credits-invoices/selling-fees?id=4364" target="_blank" style="color: var(--result-value-color);">eBay's official fee page</a> for the most accurate and up-to-date information.
+        </div>
+    </div>
+
+    <script>
+        // Define eBay fee structures by category
+        // IMPORTANT: eBay fees can change. Always verify the latest rates on eBay's website.
+        const feesByCategory = {
+            "sportsCards": {
+                name: "Sports Trading Cards",
+                fvf_tier1_percent: 0.1325, // 13.25%
+                fvf_tier1_threshold: 7500, // up to $7,500
+                fvf_tier2_percent: 0.0235, // 2.35% for amount over $7,500
+                fixed_fee_rules: [
+                    { threshold: 10, fee: 0.30 }, // $0.30 for sales up to $10.00
+                    { threshold: Infinity, fee: 0.40 } // $0.40 for sales over $10.00
+                ]
+            },
+            "mostOtherCategories": {
+                name: "Most Other Categories (e.g., Electronics, Home & Garden)",
+                fvf_tier1_percent: 0.1325, // 13.25%
+                fvf_tier1_threshold: 7500, // up to $7,500
+                fvf_tier2_percent: 0.0235, // 2.35% for amount over $7,500
+                fixed_fee_rules: [
+                    { threshold: Infinity, fee: 0.40 } // Standard $0.40 fixed fee for most categories
+                ]
+            },
+            "fashion": { // Example values. Always verify current eBay Fashion fees.
+                name: "Fashion (Clothing, Shoes & Accessories)",
+                fvf_tier1_percent: 0.15, // Example: 15%
+                fvf_tier1_threshold: 2500, // Example threshold
+                fvf_tier2_percent: 0.09, // Example: 9% for amount over threshold
+                fixed_fee_rules: [
+                    { threshold: Infinity, fee: 0.40 } // Standard $0.40 fixed fee
+                ]
+            },
+            "custom": {
+                name: "Custom Percentage",
+                fvf_tier1_percent: 0, // This will be dynamically set by user input
+                fvf_tier1_threshold: Infinity, // Assumes single tier for custom percentage
+                fvf_tier2_percent: 0, // No second tier for custom percentage
+                fixed_fee_rules: [
+                    { threshold: Infinity, fee: 0.40 } // Default to standard fixed fee for custom
+                ]
+            }
+        };
+
+        function calculateFees() {
+            const soldPrice = parseFloat(document.getElementById('soldPrice').value);
+            const customerShipping = parseFloat(document.getElementById('customerShipping').value);
+            const yourShipping = parseFloat(document.getElementById('yourShipping').value);
+            const insertionFee = parseFloat(document.getElementById('insertionFee').value);
+            const selectedCategoryKey = document.getElementById('categorySelect').value;
+
+            let currentCategoryFees = feesByCategory[selectedCategoryKey];
+
+            // If custom category is selected, get percentage from new input field
+            if (selectedCategoryKey === 'custom') {
+                const customPercentInput = parseFloat(document.getElementById('customPercentage').value);
+                if (!isNaN(customPercentInput) && customPercentInput >= 0) {
+                    // Create a temporary object for custom fees to avoid modifying the original
+                    currentCategoryFees = { ...currentCategoryFees };
+                    currentCategoryFees.fvf_tier1_percent = customPercentInput / 100; // Convert percentage to decimal
+                } else {
+                    // Handle invalid custom percentage input
+                    document.getElementById('totalEbayFees').textContent = '0.00';
+                    document.getElementById('netProfit').textContent = '0.00';
+                    return;
+                }
+            }
+
+            // Handle other invalid inputs gracefully
+            if (isNaN(soldPrice) || isNaN(customerShipping) || isNaN(yourShipping) || isNaN(insertionFee)) {
+                document.getElementById('totalEbayFees').textContent = '0.00';
+                document.getElementById('netProfit').textContent = '0.00';
+                return;
+            }
+
+            // Calculate total amount for FVF (item price + customer paid shipping)
+            const totalPayoutBasis = soldPrice + customerShipping;
+
+            let fvfPercentageFee;
+            if (totalPayoutBasis <= currentCategoryFees.fvf_tier1_threshold) {
+                fvfPercentageFee = totalPayoutBasis * currentCategoryFees.fvf_tier1_percent;
+            } else {
+                fvfPercentageFee = (currentCategoryFees.fvf_tier1_threshold * currentCategoryFees.fvf_tier1_percent) +
+                                   ((totalPayoutBasis - currentCategoryFees.fvf_tier1_threshold) * currentCategoryFees.fvf_tier2_percent);
+            }
+
+            let fixedPerOrderFee = 0;
+            // Determine fixed fee based on category-specific rules
+            for (const rule of currentCategoryFees.fixed_fee_rules) {
+                if (totalPayoutBasis <= rule.threshold) {
+                    fixedPerOrderFee = rule.fee;
+                    break;
+                }
+            }
+
+            const totalEbayFees = fvfPercentageFee + fixedPerOrderFee + insertionFee;
+            const netProfit = soldPrice + customerShipping - yourShipping - totalEbayFees;
+
+            document.getElementById('totalEbayFees').textContent = totalEbayFees.toFixed(2);
+            document.getElementById('netProfit').textContent = netProfit.toFixed(2);
+        }
+
+        // Function to show/hide the custom percentage input field
+        function toggleCustomPercentageInput() {
+            const categorySelect = document.getElementById('categorySelect');
+            const customPercentageGroup = document.getElementById('customPercentageGroup');
+
+            if (categorySelect.value === 'custom') {
+                customPercentageGroup.style.display = 'block';
+            } else {
+                customPercentageGroup.style.display = 'none';
+            }
+        }
+
+        // Function to reset all inputs and results
+        function resetCalculator() {
+            document.getElementById('soldPrice').value = '0.00';
+            document.getElementById('customerShipping').value = '0.00';
+            document.getElementById('yourShipping').value = '0.00';
+            document.getElementById('insertionFee').value = '0.00';
+            document.getElementById('customPercentage').value = '10.00'; // Reset custom percentage to default
+            
+            // Reset category dropdown to default and hide custom input
+            document.getElementById('categorySelect').value = 'sportsCards';
+            toggleCustomPercentageInput(); // Ensure custom input is hidden
+
+            // Clear results
+            document.getElementById('totalEbayFees').textContent = '0.00';
+            document.getElementById('netProfit').textContent = '0.00';
+
+            // Re-run calculateFees to ensure everything is consistent
+            calculateFees();
+        }
+
+        // Dark Mode Logic
+        const checkbox = document.getElementById('checkbox');
+        const body = document.body;
+
+        function applyTheme(isDarkMode) {
+            if (isDarkMode) {
+                body.classList.add('dark-mode');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                body.classList.remove('dark-mode');
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        // Initialize calculation and theme on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                checkbox.checked = true;
+                applyTheme(true);
+            } else {
+                checkbox.checked = false;
+                applyTheme(false);
+            }
+            toggleCustomPercentageInput(); 
+            calculateFees();
+        });
+
+        checkbox.addEventListener('change', () => {
+            applyTheme(checkbox.checked);
+        });
+
+        // Add event listeners to input fields for dynamic calculation
+        document.getElementById('soldPrice').addEventListener('input', calculateFees);
+        document.getElementById('customerShipping').addEventListener('input', calculateFees);
+        document.getElementById('yourShipping').addEventListener('input', calculateFees);
+        document.getElementById('insertionFee').addEventListener('input', calculateFees);
+    </script>
+</body>
+</html>
